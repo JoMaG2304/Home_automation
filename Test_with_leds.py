@@ -1,10 +1,14 @@
-import RPi.GPIO as GPIO
-import paho.mqtt.client as mqtt
-import time
+#This application is used to controll the pin 17 of the GPIO
+#of the Raspberry Pi 3. It uses paho to comunicate to a mqtt broker
+
+
+
+import RPi.GPIO as GPIO #import library to controll the GPIO of the RPi
+import paho.mqtt.client as mqtt #import Library to communicate trough MQTT
+import time #Library to be able to use the sleep function
 
 #Configure the pins of the raspberry
 GPIO.setmode(GPIO.BCM)
-#GPIO.setup(18, GPIO.OUT)
 GPIO.setup(17, GPIO.OUT)
 GPIO.setup(12, GPIO.IN)
 GPIO.setup(16, GPIO.IN)
@@ -15,9 +19,10 @@ def on_connect(client, userdata, flags, rc):
     +str(rc)+"client1_id  "+str(client)
     print(m)
 
+#The callback to receive and process messages
 def on_message(client1, userdata, message):
     print("message received  "  ,str(message.payload.decode("utf-8")))
-    state = str(message.payload.decode("utf-8"))
+    state = str(message.payload.decode("utf-8")) # save on "state" the message 
     
     if (state == "1"):
         GPIO.output(17, GPIO.HIGH)
@@ -36,13 +41,13 @@ time.sleep(1)
 client1.connect(broker_address)     #Connect to broker
 client1.loop_start()               #start loop to process callbacks
 
-client1.subscribe("led/rojo")
+client1.subscribe("led/rojo")   #Subscribe to the topic
 #client1.subscribe("led/amarillo")
 #client1.publish("led/rojo","OFF")
     
 
 
-time.sleep(60)
-GPIO.output(17, GPIO.LOW)
-client1.disconnect()
+time.sleep(60)      #wait 1 minute 
+GPIO.output(17, GPIO.LOW)   #turn doff the led 
+client1.disconnect()    #Disconnect
 client1.loop_stop()
